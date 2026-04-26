@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Fatih Çelik Villa Kent | Elite Checkout</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" />
+    
+    <style>
+        :root {
+            --ana-mavi: #0a192f;
+            --ana-gold: #d4af37;
+            --vurgu-gold: #fccf31;
+        }
+
+        body { background-color: #f4f7f6; font-family: 'Poppins', sans-serif; overflow-x: hidden; }
+
+        /* --- GÜNCELLENEN GİRİŞ EKRANI --- */
+        #loginOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(10, 25, 47, 0.9), rgba(10, 25, 47, 0.95)), 
+                        url('https://images.pexels.com/photos/1732414/pexels-photo-1732414.jpeg?auto=compress&cs=tinysrgb&w=1600');
+            background-size: cover; z-index: 9999; display: flex; align-items: center; justify-content: center;
+        }
+        .login-card { 
+            background: white; padding: 40px; border-radius: 30px; 
+            border: 2px solid var(--ana-gold); text-align: center; 
+            width: 100%; max-width: 420px; box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+        .gold-text { background: linear-gradient(45deg, #bf953f, #fcf6ba, #b38728); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 900; }
+        
+        /* --- KARTLAR & DÜZEN --- */
+        .card { border: none; border-radius: 25px; transition: 0.4s; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .card:hover { transform: translateY(-10px); }
+        .img-container { position: relative; height: 250px; overflow: hidden; cursor: pointer; }
+        .daire-img { width: 100%; height: 100%; object-fit: cover; }
+        .price-tag { background: var(--ana-mavi); color: var(--vurgu-gold); padding: 5px 15px; border-radius: 50px; font-weight: 600; }
+
+        /* --- ÖDEME SAYFASI --- */
+        .checkout-container { max-width: 900px; margin: 50px auto; }
+        .payment-card-visual {
+            background: linear-gradient(135deg, #0a192f 0%, #1c3d5a 100%);
+            color: white; padding: 30px; border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2); margin-bottom: -50px;
+            position: relative; z-index: 2;
+        }
+        .form-container { background: white; padding: 80px 40px 40px 40px; border-radius: 30px; z-index: 1; }
+        .btn-premium { background: var(--ana-mavi); color: white; border: none; border-radius: 12px; padding: 15px; font-weight: 600; width: 100%; transition: 0.3s; }
+        .btn-premium:hover { background: var(--ana-gold); color: var(--ana-mavi); }
+
+        .navbar { background: var(--ana-mavi) !important; border-bottom: 2px solid var(--ana-gold); }
+    </style>
+</head>
+<body>
+
+    <div id="loginOverlay">
+        <div class="login-card animate__animated animate__zoomIn">
+            <i class="bi bi-shield-lock gold-text display-3 mb-3"></i>
+            <h2 class="gold-text mb-2">ELITE PORTFOLIO</h2>
+            <p class="text-muted small mb-4">Lütfen erişim bilgilerinizi giriniz.</p>
+            
+            <div class="form-floating mb-3 text-start">
+                <input type="email" class="form-control rounded-4" id="loginEmail" placeholder="E-posta">
+                <label>E-posta Adresi</label>
+            </div>
+            <div class="form-floating mb-4 text-start">
+                <input type="password" class="form-control rounded-4" id="loginPass" placeholder="Şifre">
+                <label>Şifre</label>
+            </div>
+            
+            <button class="btn btn-premium py-3 shadow" onclick="girisYap()">KEŞFETMEYE BAŞLA</button>
+        </div>
+    </div>
+
+    <div id="mainContent" style="display:none;">
+        <nav class="navbar navbar-dark sticky-top p-3">
+            <div class="container">
+                <a class="navbar-brand fw-bold" href="#">FATİH ÇELİK <span class="fw-light">VILLA</span></a>
+                <button class="btn btn-outline-warning btn-sm" onclick="location.reload()">ÇIKIŞ YAP</button>
+            </div>
+        </nav>
+
+        <div id="listeSayfasi" class="container my-5">
+            <div class="text-center mb-5">
+                <h1 class="display-4 fw-bold">Seçkin Portföy</h1>
+                <p class="text-muted">Başyapıtlarımızı inceleyin ve hayallerinize dokunun.</p>
+            </div>
+            <div class="row row-cols-1 row-cols-md-3 g-4" id="villaListesi"></div>
+        </div>
+
+        <div id="sepetSayfasi" style="display:none;" class="container py-5">
+            <div class="checkout-container">
+                <div class="row g-5">
+                    <div class="col-lg-5 order-2 order-lg-1">
+                        <div class="card p-4 shadow-sm h-100">
+                            <h4 class="fw-bold mb-4">Sipariş Özeti</h4>
+                            <div class="d-flex align-items-center mb-4">
+                                <img id="checkoutImg" src="" style="width: 80px; height: 80px; object-fit: cover; border-radius: 15px;">
+                                <div class="ms-3">
+                                    <h6 id="sepetDaireAdi" class="mb-1 fw-bold"></h6>
+                                    <p id="sepetDaireOzellik" class="small text-muted mb-0"></p>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between mb-2"><span>Emlak Bedeli</span><span id="sepetFiyat"></span></div>
+                            <div class="d-flex justify-content-between mb-2"><span>KDV & Harç</span><span>Dahil</span></div>
+                            <div class="d-flex justify-content-between mt-3 fw-bold fs-5 border-top pt-3">
+                                <span>GENEL TOPLAM</span>
+                                <span class="gold-text" id="finalFiyat"></span>
+                            </div>
+                            <div class="mt-5 text-center">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" width="40" class="me-3 opacity-75">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" width="40" class="opacity-75">
+                                <p class="small text-muted mt-3"><i class="bi bi-lock-fill"></i> Güvenli 3D Secure Ödeme Hattı</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-7 order-1 order-lg-2">
+                        <div class="payment-card-visual animate__animated animate__flipInX">
+                            <div class="d-flex justify-content-between align-items-start mb-4">
+                                <i class="bi bi-chip fs-1 text-warning"></i>
+                                <i class="bi bi-broadcast fs-2 text-white-50"></i>
+                            </div>
+                            <h3 class="mb-4 text-center tracking-widest" id="cardNoDisplay">**** **** **** ****</h3>
+                            <div class="d-flex justify-content-between">
+                                <div><small class="d-block opacity-50">KART SAHİBİ</small><span id="cardNameDisplay">AD SOYAD</span></div>
+                                <div><small class="d-block opacity-50">SKT</small><span id="cardDateDisplay">MM/YY</span></div>
+                            </div>
+                        </div>
+
+                        <div class="form-container shadow-lg">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label class="form-label small fw-bold">AD SOYAD</label>
+                                    <input type="text" class="form-control" id="cardName" oninput="updateCard()">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label small fw-bold">KART NUMARASI</label>
+                                    <input type="text" class="form-control" id="cardNum" maxlength="19" oninput="updateCard()">
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label small fw-bold">SON KULLANMA</label>
+                                    <input type="text" class="form-control" id="cardDate" placeholder="MM/YY" maxlength="5" oninput="updateCard()">
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label small fw-bold">CVC</label>
+                                    <input type="password" class="form-control" placeholder="***" maxlength="3">
+                                </div>
+                                <div class="col-12 mt-4">
+                                    <button class="btn btn-premium py-3" onclick="odemeTamamla()">İŞLEMİ ONAYLA</button>
+                                    <button class="btn btn-link w-100 text-muted mt-2" onclick="listeSayfasinaDon()">Vazgeç</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/gh/mcstudios/glightbox/dist/js/glightbox.min.js"></script>
+    <script>
+        const villalar = [
+            { id: "v1", ad: "Safir Malikane", fiyat: "12.500.000 TL", ozellik: "6+2 | 450m²", img: "https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg" },
+            { id: "v2", ad: "Zümrüt Konak", fiyat: "9.200.000 TL", ozellik: "5+1 | 380m²", img: "https://images.pexels.com/photos/8031875/pexels-photo-8031875.jpeg" },
+            { id: "v3", ad: "Altın Bahçe", fiyat: "7.850.000 TL", ozellik: "4+1 | 320m²", img: "https://images.pexels.com/photos/209296/pexels-photo-209296.jpeg" }
+        ];
+
+        function girisYap() {
+            const email = document.getElementById('loginEmail').value;
+            const pass = document.getElementById('loginPass').value;
+
+            if(email === "" || pass === "") {
+                alert("Lütfen tüm alanları doldurunuz.");
+                return;
+            }
+
+            document.getElementById('loginOverlay').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+            renderList();
+            GLightbox({ selector: '.glightbox' });
+        }
+
+        function renderList() {
+            const listDiv = document.getElementById('villaListesi');
+            listDiv.innerHTML = ""; // Temizle
+            villalar.forEach(v => {
+                listDiv.innerHTML += `
+                    <div class="col animate__animated animate__fadeInUp">
+                        <div class="card h-100">
+                            <div class="img-container">
+                                <a href="${v.img}" class="glightbox"><img src="${v.img}" class="daire-img"></a>
+                            </div>
+                            <div class="card-body p-4">
+                                <h5 class="fw-bold">${v.ad}</h5>
+                                <p class="small text-muted">${v.ozellik}</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="price-tag">${v.fiyat}</span>
+                                    <button class="btn btn-dark btn-sm rounded-pill px-3" onclick="sepeteGit('${v.id}')">Satın Al</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function sepeteGit(id) {
+            const villa = villalar.find(x => x.id === id);
+            document.getElementById('sepetDaireAdi').innerText = villa.ad;
+            document.getElementById('sepetDaireOzellik').innerText = villa.ozellik;
+            document.getElementById('sepetFiyat').innerText = villa.fiyat;
+            document.getElementById('finalFiyat').innerText = villa.fiyat;
+            document.getElementById('checkoutImg').src = villa.img;
+            
+            document.getElementById('listeSayfasi').style.display = 'none';
+            document.getElementById('sepetSayfasi').style.display = 'block';
+            window.scrollTo(0,0);
+        }
+
+        function updateCard() {
+            const name = document.getElementById('cardName').value;
+            const num = document.getElementById('cardNum').value;
+            const date = document.getElementById('cardDate').value;
+            
+            document.getElementById('cardNameDisplay').innerText = name.toUpperCase() || "AD SOYAD";
+            document.getElementById('cardNoDisplay').innerText = num || "**** **** **** ****";
+            document.getElementById('cardDateDisplay').innerText = date || "MM/YY";
+        }
+
+        function odemeTamamla() {
+            alert('Tebrikler! Mülk alım işleminiz başarıyla başlatıldı. Müşteri temsilcimiz Fatih Çelik sizinle iletişime geçecektir.');
+            location.reload();
+        }
+
+        function listeSayfasinaDon() {
+            document.getElementById('listeSayfasi').style.display = 'block';
+            document.getElementById('sepetSayfasi').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
